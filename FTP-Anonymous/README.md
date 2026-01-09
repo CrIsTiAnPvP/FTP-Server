@@ -1,12 +1,12 @@
-# Dockerized Anonymous FTP Mirror
+# Dockerized Anonymous FTP
 
 ## Description
 
-This setup deploys a `vsftpd` server inside a Docker container, specifically pre-configured to act as an anonymous mirror for OpenSuse updates for the `sistema.sol` domain.
+This setup deploys a `vsftpd` server inside a Docker container, specifically pre-configured to act as an anonymous ftp server for OpenSuse updates for the `mirror.sistema.sol` domain.
 
 ## Docker Configuration Highlights
 
-* **Image**: Based on `debian:stable` or `delfer/vsftpd`.
+* **Image**: Based on `fauria/vsftpd`.
 * **Network**: Listens on IPv4, mapping container port 21 to host port 21.
 * **Security Policy**:
 * **Anonymous Access**: Enabled (Read-only).
@@ -21,5 +21,4 @@ This setup deploys a `vsftpd` server inside a Docker container, specifically pre
 
 ## Usage
 
-1. Build the image: `docker build -t ftp-anonimo .`
-2. Run the container: `docker run -d -p 21:21 --name ftp-mirror ftp-anonimo`
+1. Run the sript: `chmod +x ./start.sh && ./start.sh`
