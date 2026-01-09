@@ -1,7 +1,6 @@
 # Initial Image & name
 FROM fauria/vsftpd AS ftp-anonymous
 
-RUN echo "mirror.sistema.sol" > /etc/hostname
 RUN echo "-- Mirror de Opensuse para 'sistema.sol'" > /etc/motd
 
 # Expose FTP ports

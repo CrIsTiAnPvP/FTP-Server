@@ -17,7 +17,7 @@ if [ ! -d "./logs" ]; then
 fi
 
 # Run the docker container
-docker run -d --name ftp-anonymous -p 20:20 -p 21:21 -p 21100-21110:21100-21110 -v "./data:/home/vsftpd" -v "./logs:/var/log/vsftpd" ftp-anonymous
+docker run -d --hostname mirror.sistema.sol --name ftp-anonymous -p 20:20 -p 21:21 -p 21100-21110:21100-21110 -v "./data:/home/vsftpd" -v "./logs:/var/log/vsftpd" ftp-anonymous
 
 # Get IP addresses
 docker_ip_addr=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ftp-anonymous)
