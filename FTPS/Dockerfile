@@ -12,8 +12,8 @@ LABEL website="cristianac.es"
 RUN mkdir /shared && chmod 777 /shared
 VOLUME /shared
 
-# Install vsftpd, openssl, lftp client and bind9
-RUN apt update && apt install -y openssl lftp vsftpd bind9
+# Install vsftpd, openssl, lftp client
+RUN apt update && apt install -y openssl lftp vsftpd
 
 # Generate SSL certificates
 RUN mkdir -p /etc/ssl/private /etc/ssl/certs
@@ -36,7 +36,6 @@ RUN touch luis1.txt luis2.txt
 WORKDIR /home/maria
 USER maria
 RUN touch maria1.txt maria2.txt
-WORKDIR /home/miguel
 
 # Return to root user
 USER root

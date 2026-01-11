@@ -1,0 +1,41 @@
+name: ftps_container
+services:
+  ftps:
+    build: .
+    container_name: ftps
+    ports:
+      - "21:21"
+      - "20:20"
+      - "21100-21110:21100-21110"
+    volumes:
+      - ./shared:/shared
+    restart: always
+    networks:
+      ftps_net:
+        ipv4_address: 192.168.69.11
+    depends_on:
+      - bind9
+    dns:
+      - 192.168.69.10
+  bind9:
+    image: ubuntu/bind9
+    container_name: dns
+    restart: always
+    volumes:
+      - ./conf/bind9/named.conf.options:/etc/bind/named.conf.options
+      - ./conf/bind9/named.conf.local:/etc/bind/named.conf.local
+      - ./conf/bind9/db.example.test:/etc/bind/db.example.test
+    environment:
+      - TZ=Europe/Madrid
+    dns:
+      - 127.0.0.1
+    networks:
+      ftps_net:
+        ipv4_address: 192.168.69.10
+
+networks:
+  ftps_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.69.0/24
