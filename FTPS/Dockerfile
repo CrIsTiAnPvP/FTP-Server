@@ -7,6 +7,11 @@ LABEL description="Docker image for a NIS activity, with a FTPS server using vsf
 LABEL website="cristianac.es"
 ###########################################
 
+################# Environment #################
+ENV domain=example.test
+ENV host=ftp.$domain
+###############################################
+
 ################# INITIAL SETUP #################
 #Create shared volume
 RUN mkdir /shared && chmod 777 /shared
@@ -18,10 +23,10 @@ RUN apt update && apt install -y openssl lftp vsftpd
 # Generate SSL certificates
 RUN mkdir -p /etc/ssl/private /etc/ssl/certs
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-    -keyout /etc/ssl/private/example.test.pem \
-    -out /etc/ssl/private/example.test.pem \
-    -subj "/C=ES/ST=Granada/L=Granada/O=IES/OU=Informatica/CN=ftp.example.test"
-RUN chmod 600 /etc/ssl/private/example.test.pem
+    -keyout /etc/ssl/private/$domain.pem \
+    -out /etc/ssl/private/$domain.pem \
+    -subj "/C=ES/ST=Granada/L=Granada/O=IZV/OU=Informatica/CN=$host"
+RUN chmod 600 /etc/ssl/private/$domain.pem
 
 # Create users
 RUN useradd -m pepe && echo "pepe:pepe" | chpasswd && \
@@ -56,6 +61,8 @@ EXPOSE 20 21 21100-21110
 # Copy configuration file
 RUN mv /etc/vsftpd.conf /etc/vsftpd.conf.bak
 COPY conf/vsftpd.conf /etc/vsftpd/vsftpd.conf
+#Replace domain placeholder in vsftpd.conf
+RUN sed -i "s/\$domain/${domain}/g" /etc/vsftpd/vsftpd.conf
 
 #Create public directory for anonymous user and add welcome message
 RUN mkdir -p /srv/ftp/pub && chmod 755 /srv/ftp/pub
@@ -65,5 +72,8 @@ COPY conf/.message /srv/ftp/pub/.message
 RUN echo "maria" > /etc/vsftpd/chroot_list
 ##################################################
 
-# Execute pepeftp.sh script at startup (Activity 1)
-CMD ["sh", "-c", "su - pepe -c '/scripts/pepeftp.sh /shared/output.txt'"]
+################# ENTRYPOINT #################
+COPY scripts/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+###############################################
