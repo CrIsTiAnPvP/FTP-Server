@@ -1,7 +1,7 @@
 name: ftps_container
 services:
   ftps:
-    build: .
+    image: cristiianpvp/ftps:latest
     container_name: ftps
     ports:
       - "21:21"

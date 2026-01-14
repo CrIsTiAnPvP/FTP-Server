@@ -1,0 +1,48 @@
+name: Publish Docker Image
+
+on:
+  push:
+    branches: ['main'] 
+    paths:
+      - FTPS/**
+
+jobs:
+  push_to_registries:
+    name: Push Docker image to Docker Hub and GitHub Packages
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DHUB_USER }}
+          password: ${{ secrets.DHUB_TOKEN }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DHUB_USER }}/ftps
+            ghcr.io/${{ github.repository_owner }}/ftps
+
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v5
+        with:
+          context: ./FTPS
+          file: ./FTPS/Dockerfile
+          push: true
+          tags: ${{ id.meta.outputs.tags }}
+          labels: ${{ id.meta.outputs.labels }}

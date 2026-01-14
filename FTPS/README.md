@@ -17,9 +17,8 @@ This project implements a secure FTP server (FTPS) using Docker. It focuses on p
 
 ## Deployment Steps
 
-1. **Generate Certificate**: Create the `.pem` file using OpenSSL.
-2. **Docker Compose**: Define volumes to persist data and mount the configuration and certificates.
-3. **Client Testing**: Verify the "Lock" icon in Filezilla or use `lftp` for CLI secure connections.
+1. **Docker Compose**: Define volumes to persist data and mount the configuration and certificates.
+2. **Client Testing**: Verify the "Lock" icon in Filezilla or use `lftp` for CLI secure connections.
 
 ## Port Mapping
 

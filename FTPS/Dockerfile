@@ -5,6 +5,7 @@ LABEL org.opencontainers.image.authors="Cristian Alonso Contreras (CrIsTiiAnPvP)
 LABEL version="1.0"
 LABEL description="Docker image for a NIS activity, with a FTPS server using vsftpd and SSL certificates from Let's Encrypt"
 LABEL website="cristianac.es"
+LABEL org.opencontainers.image.source="https://github.com/CrIsTiAnPvP/FTP-Server"
 ###########################################
 
 ################# Environment #################
@@ -52,6 +53,8 @@ WORKDIR /
 RUN mkdir /scripts
 COPY scripts/pepeftp.sh /scripts/pepeftp.sh
 RUN chmod +x /scripts/pepeftp.sh
+COPY scripts/checkftp.sh /scripts/checkftp.sh
+RUN chmod +x /scripts/checkftp.sh
 ##########################################
 
 ############ FTP SERVER CONFIGURATION ############
