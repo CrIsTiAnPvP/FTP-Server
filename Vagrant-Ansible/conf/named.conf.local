@@ -1,4 +1,4 @@
-zone "example.test" {
+zone "isrv.test" {
     type master;
-    file "/etc/bind/db.example.test";
+    file "/etc/bind/db.isrv.test";
 };
