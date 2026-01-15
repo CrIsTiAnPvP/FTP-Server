@@ -10,6 +10,27 @@
         state: present
         update_cache: true
 
+    - name: Install openssl package
+      ansible.builtin.apt:
+        name: openssl
+        state: present
+        update_cache: true
+
+    - name: Create SSL certificate directory
+      ansible.builtin.file:
+        name: /etc/ssl/private
+        state: directory
+        mode: '0700'
+
+    - name: Generate self-signed SSL certificate
+      ansible.builtin.command: >
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048
+        -keyout /etc/ssl/private/vsftpd.pem
+        -out /etc/ssl/private/vsftpd.pem
+        -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=isrv.test"
+      args:
+        creates: /etc/ssl/private/vsftpd.pem
+
     - name: Ensure vsftpd service is enabled and started
       ansible.builtin.service:
         name: vsftpd
