@@ -1,0 +1,157 @@
+---
+- name: Install and configure vsftpd
+  hosts: ftp_servers
+  become: true
+
+  tasks:
+    - name: Install vsftpd package
+      ansible.builtin.apt:
+        name: vsftpd
+        state: present
+        update_cache: true
+
+    - name: Ensure vsftpd service is enabled and started
+      ansible.builtin.service:
+        name: vsftpd
+        state: started
+        enabled: true
+
+    - name: Configure vsftpd
+      ansible.builtin.copy:
+        src: ../conf/vsftpd.conf
+        dest: /etc/vsftpd.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Create vsftpd directory
+      ansible.builtin.file:
+        path: /etc/vsftpd
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Create chroot_list
+      ansible.builtin.file:
+        path: /etc/vsftpd/chroot_list
+        state: touch
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Unjail maria user
+      ansible.builtin.lineinfile:
+        path: /etc/vsftpd/chroot_list
+        line: maria
+        state: present
+      notify:
+        - Restart vsftpd
+
+    - name: Create pub directory
+      ansible.builtin.file:
+        path: /srv/ftp/pub
+        state: directory
+        owner: ftp
+        group: ftp
+        mode: '0755'
+
+    - name: Copy welcome message
+      ansible.builtin.copy:
+        src: ../conf/.message
+        dest: /srv/ftp/.message
+        owner: ftp
+        group: ftp
+        mode: '0644'
+
+  handlers:
+    - name: Restart vsftpd
+      ansible.builtin.service:
+        name: vsftpd
+        state: restarted
+
+- name: Install and configure BIND9 DNS server
+  hosts: dns_servers
+  become: true
+
+  tasks:
+    - name: Install BIND9 package
+      ansible.builtin.apt:
+        name: bind9
+        state: present
+        update_cache: true
+
+    - name: Ensure BIND9 service is enabled and started
+      ansible.builtin.service:
+        name: bind9
+        state: started
+        enabled: true
+
+    - name: Copy BIND9 options
+      ansible.builtin.copy:
+        src: ../conf/named.conf.options
+        dest: /etc/bind/named.conf.options
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copy DNS database files
+      ansible.builtin.copy:
+        src: ../conf/db.isrv.test
+        dest: /etc/bind/db.isrv.test
+        owner: root
+        group: bind
+        mode: '0640'
+
+    - name: Copy local BIND9 configuration
+      ansible.builtin.copy:
+        src: ../conf/named.conf.local
+        dest: /etc/bind/named.conf.local
+        owner: root
+        group: root
+        mode: '0644'
+      notify:
+        - Restart BIND9
+
+
+  handlers:
+    - name: Restart BIND9
+      ansible.builtin.service:
+        name: bind9
+        state: restarted
+
+- name: Create users
+  hosts: ftp_servers
+  become: true
+
+  vars:
+    users:
+      - username: luis
+        password: "1234"
+      - username: maria
+        password: "1234"
+      - username: miguel
+        password: "1234"
+
+  tasks:
+    - name: Create user accounts
+      ansible.builtin.user:
+        name: "{{ item.username }}"
+        password: "{{ item.password | password_hash('sha512') }}"
+        state: present
+        create_home: true
+      loop: "{{ users }}"
+
+    - name: Create files
+      ansible.builtin.file:
+        path: "/home/{{ item.username }}/file1.txt"
+        state: touch
+        mode: '0760'
+      loop: "{{ users }}"
+
+    - name: Create files
+      ansible.builtin.file:
+        path: "/home/{{ item.username }}/file2.txt"
+        state: touch
+        mode: '0760'
+      loop: "{{ users }}"
