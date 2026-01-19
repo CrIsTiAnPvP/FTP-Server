@@ -157,6 +157,9 @@
         password: "1234"
       - username: miguel
         password: "1234"
+    user_files:
+      - file1.txt
+      - file2.txt
 
   tasks:
     - name: Create user accounts
@@ -172,4 +175,6 @@
         path: "/home/{{ item[0].username }}/{{ item[1] }}"
         state: touch
         mode: '0760'
-      loop: "{{ users | product(['file1.txt', 'file2.txt']) | list }}"
+      loop: "{{ users | product(user_files) | list }}"
+      loop_control:
+        label: "{{ item[0].username }}/{{ item[1] }}"
