@@ -49,29 +49,26 @@ WORKDIR /
 #################################################
 
 ############ Activity 1 Setup ############
-# Copy and set execute permissions to the script
+# Copy and set execute permissions to the scripts
 RUN mkdir /scripts
-COPY scripts/pepeftp.sh /scripts/pepeftp.sh
-RUN chmod +x /scripts/pepeftp.sh
-COPY scripts/checkftp.sh /scripts/checkftp.sh
-RUN chmod +x /scripts/checkftp.sh
+COPY scripts/pepeftp.sh scripts/checkftp.sh /scripts/
+RUN chmod +x /scripts/pepeftp.sh /scripts/checkftp.sh
 ##########################################
 
 ############ FTP SERVER CONFIGURATION ############
 # Expose FTP ports
 EXPOSE 20 21 21100-21110
 
-# Copy configuration file
+# Copy configuration file and replace domain placeholder
 RUN mv /etc/vsftpd.conf /etc/vsftpd.conf.bak
 COPY conf/vsftpd.conf /etc/vsftpd/vsftpd.conf
-#Replace domain placeholder in vsftpd.conf
 RUN sed -i "s/\$domain/${domain}/g" /etc/vsftpd/vsftpd.conf
 
-#Create public directory for anonymous user and add welcome message
+# Create public directory for anonymous user and add welcome message
 RUN mkdir -p /srv/ftp/pub && chmod 755 /srv/ftp/pub
 COPY conf/.message /srv/ftp/pub/.message
 
-#Allow maria to not be jailed
+# Allow maria to not be jailed
 RUN echo "maria" > /etc/vsftpd/chroot_list
 ##################################################
 
