@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set eux
+set -eux
 
 # Build the docker image
 docker build -t ftp-anonymous .

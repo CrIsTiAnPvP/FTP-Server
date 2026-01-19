@@ -4,13 +4,13 @@ if [ -n "$1" ]; then
     exec > "$1" 2>&1
 fi
 
-cat /etc/passwd | grep -q ftp && echo -ne "\e[32mFTP user exists\e[0m" || echo -e "\e[31mFTP user does NOT exist\e[0m"
+grep -q ftp /etc/passwd && echo -ne "\e[32mFTP user exists\e[0m" || echo -e "\e[31mFTP user does NOT exist\e[0m"
 echo -ne "\e[33m --> \e[36m"
-cat /etc/passwd | grep ftp
+grep ftp /etc/passwd
 
-cat /etc/group | grep -q ftp && echo -ne "\e[32mFTP group exists\e[0m" || echo -e "\e[31mFTP group does NOT exist\e[0m"
+grep -q ftp /etc/group && echo -ne "\e[32mFTP group exists\e[0m" || echo -e "\e[31mFTP group does NOT exist\e[0m"
 echo -ne "\e[33m --> \e[36m"
-cat /etc/group | grep ftp
+grep ftp /etc/group
 
 echo -ne "\e[0m"
 

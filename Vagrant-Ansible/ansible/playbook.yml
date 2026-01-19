@@ -4,17 +4,17 @@
   become: true
 
   tasks:
-    - name: Install vsftpd package
+    - name: Update apt cache
       ansible.builtin.apt:
-        name: vsftpd
-        state: present
         update_cache: true
+        cache_valid_time: 3600
 
-    - name: Install openssl package
+    - name: Install vsftpd and openssl packages
       ansible.builtin.apt:
-        name: openssl
+        name:
+          - vsftpd
+          - openssl
         state: present
-        update_cache: true
 
     - name: Create SSL certificate directory
       ansible.builtin.file:
@@ -96,11 +96,15 @@
   become: true
 
   tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
     - name: Install BIND9 package
       ansible.builtin.apt:
         name: bind9
         state: present
-        update_cache: true
 
     - name: Ensure BIND9 service is enabled and started
       ansible.builtin.service:
@@ -153,6 +157,9 @@
         password: "1234"
       - username: miguel
         password: "1234"
+    user_files:
+      - file1.txt
+      - file2.txt
 
   tasks:
     - name: Create user accounts
@@ -163,16 +170,11 @@
         create_home: true
       loop: "{{ users }}"
 
-    - name: Create files
+    - name: Create user files
       ansible.builtin.file:
-        path: "/home/{{ item.username }}/file1.txt"
+        path: "/home/{{ item[0].username }}/{{ item[1] }}"
         state: touch
         mode: '0760'
-      loop: "{{ users }}"
-
-    - name: Create files
-      ansible.builtin.file:
-        path: "/home/{{ item.username }}/file2.txt"
-        state: touch
-        mode: '0760'
-      loop: "{{ users }}"
+      loop: "{{ users | product(user_files) | list }}"
+      loop_control:
+        label: "{{ item[0].username }}/{{ item[1] }}"
