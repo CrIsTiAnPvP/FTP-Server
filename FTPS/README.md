@@ -28,6 +28,8 @@ This project implements a secure **FTPS server** using `vsftpd` with SSL/TLS enc
   * **Chroot Jail**: All users are jailed by default except for those explicitly listed in `chroot_list` (e.g., `maria`).
 * **Anonymous Access**: Public directory enabled at `/srv/ftp/pub` with a custom welcome message.
 
+---
+
 ### 2. DNS Integration (`bind9`)
 
 * A dedicated container runs **Bind9** to provide name resolution within the internal network.
@@ -51,6 +53,8 @@ At runtime, the container executes the following sequence:
 
 * **Service Launch**: Starts the `vsftpd` daemon in the foreground.
 
+---
+
 ### 2. System Verification (`checkftp.sh`)
 
 This script performs automated checks on the server's internal state:
@@ -59,6 +63,8 @@ This script performs automated checks on the server's internal state:
 
 * **Directory Ownership**: Verifies that the `/srv/ftp` directory is owned by the `root` user.
 * **Visual Feedback**: Uses color-coded output to report status (Green for success, Red for failure).
+
+---
 
 ### 3. Client Simulation (`pepeftp.sh`)
 
@@ -70,6 +76,29 @@ An automated test script using the `lftp` client to simulate real operations:
   * List remote and local files.
   * Download the `/pub/check` file and verify its presence.
   * Create a local directory (`img`) and upload a test file (`datos1.txt`).
+
+---
+
+### 4. FTP Client Exercise - RedIRIS (`Filezilla`)
+
+#### 1. Which mode did the client use (active or passive) when downloading the server's file list?
+
+The client used **Passive Mode**. In the FileZilla log, although it connects to port 21 for commands, the standard behavior for modern clients like FileZilla is to send the `PASV` command to establish a data connection that can bypass firewalls.
+
+#### 2. What is the IP address of the `ftp.rediris.es` server?
+
+The IP address is **130.206.13.2**. This can be seen in the status log: `Connecting to 130.206.13.2:21...`.
+
+#### 3. In the message `227 Entering Passive Mode (h1,h2,h3,h4,p1,p2)`, what do the last two numbers mean?
+
+The last two numbers (**163** and **170**) are used to calculate the **TCP port number** that the server has opened for the data transfer. 
+The formula to get the port is:  
+
+$$(p1 \times 256) + p2$$
+
+#### 4. File Download
+
+The file `welcome.msg` was successfully located in the remote directory and downloaded to the local path `/home/alumnom/`.
 
 ---
 
